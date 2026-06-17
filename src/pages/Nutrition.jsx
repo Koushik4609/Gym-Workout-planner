@@ -4,18 +4,14 @@ import { Doughnut } from 'react-chartjs-2';
 import { calculateBMR, calculateTDEE, calculateMacros } from '../data/nutritionData';
 import { generateMealPlanAI } from '../services/aiService';
 import { Flame, Beef, Wheat, Droplet, UtensilsCrossed, Calculator, Target, Download, Sparkles } from 'lucide-react';
+import { useData } from '../contexts/DataContext';
 
 ArcChart.register(ArcElement, Tooltip, Legend);
 
 export default function Nutrition() {
   const [phaseToggle, setPhaseToggle] = useState('Muscle Gain'); // Maintenance, Muscle Gain, Fat Loss
   
-  const [profile] = useState(() => {
-    const saved = localStorage.getItem('fitforge-profile');
-    return saved ? JSON.parse(saved) : {
-      weight: 75, height: 178, age: 28, gender: 'Male', goal: 'Muscle Gain'
-    };
-  });
+  const { profile } = useData();
 
   const [mealPlan, setMealPlan] = useState(() => {
     const saved = localStorage.getItem('fitforge-mealplan');
@@ -24,7 +20,7 @@ export default function Nutrition() {
 
   const [generating, setGenerating] = useState(false);
 
-  const bmr = calculateBMR(profile.weight || 75, profile.height || 178, profile.age || 28, profile.gender || 'Male');
+  const bmr = calculateBMR(profile?.weight || 75, profile?.height || 178, profile?.age || 28, profile?.gender || 'Male');
   const tdee = calculateTDEE(bmr, 'moderate');
 
   // Multi-phase target calculator
@@ -34,7 +30,7 @@ export default function Nutrition() {
     return Math.round(tdee); // Maintenance
   }, [tdee, phaseToggle]);
 
-  const macros = calculateMacros(calorieTarget, phaseToggle, profile.weight || 75);
+  const macros = calculateMacros(calorieTarget, phaseToggle, profile?.weight || 75);
 
   const macroChartData = {
     labels: ['Protein', 'Carbs', 'Fat'],

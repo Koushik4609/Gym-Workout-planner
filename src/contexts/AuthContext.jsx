@@ -20,7 +20,6 @@ export function useAuth() {
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isDemo, setIsDemo] = useState(false);
 
   function signup(email, password, displayName) {
     return createUserWithEmailAndPassword(auth, email, password).then((cred) => {
@@ -33,7 +32,6 @@ export function AuthProvider({ children }) {
   }
 
   function logout() {
-    setIsDemo(false);
     return signOut(auth);
   }
 
@@ -46,26 +44,13 @@ export function AuthProvider({ children }) {
     return signInWithPopup(auth, provider);
   }
 
-  function demoLogin() {
-    setIsDemo(true);
-    setCurrentUser({
-      uid: 'demo-user-001',
-      email: 'demo@fitforge.ai',
-      displayName: 'Alex Johnson',
-      photoURL: null,
-      isDemo: true
-    });
-  }
-
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (!isDemo) {
-        setCurrentUser(user);
-      }
+      setCurrentUser(user);
       setLoading(false);
     });
     return unsubscribe;
-  }, [isDemo]);
+  }, []);
 
   const value = {
     currentUser,
@@ -74,8 +59,6 @@ export function AuthProvider({ children }) {
     logout,
     resetPassword,
     googleLogin,
-    demoLogin,
-    isDemo,
     loading
   };
 

@@ -71,19 +71,10 @@ export default function ActiveWorkout() {
   const timerRef = useRef(null);
   const restTimerRef = useRef(null);
 
-  // Init mock plan
+  // Init plan
   useEffect(() => {
-    // In a real app we'd load the generated plan here
-    const mockPlan = [
-      { id: 'ex1', name: 'Bench Press', sets: 3, reps: '8-10', rest: 60, target: 'Chest' },
-      { id: 'ex2', name: 'Incline Dumbbell Press', sets: 3, reps: '10-12', rest: 60, target: 'Upper Chest' },
-      { id: 'ex3', name: 'Tricep Pushdown', sets: 3, reps: '12-15', rest: 45, target: 'Triceps' }
-    ];
-    
-    setExercises(mockPlan.map(ex => ({
-      ...ex,
-      setsLogs: Array.from({ length: ex.sets }).map(() => ({ weight: '', reps: parseInt(ex.reps) || 10, completed: false, isPR: false }))
-    })));
+    // Start with an empty plan for the user to add exercises
+    setExercises([]);
   }, []);
 
   // Main Timer

@@ -11,7 +11,7 @@ export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signup, demoLogin, googleLogin } = useAuth();
+  const { signup, googleLogin } = useAuth();
   const navigate = useNavigate();
 
   async function handleSubmit(e) {
@@ -33,11 +33,6 @@ export default function Signup() {
         : 'Failed to create account. Please try again.');
     }
     setLoading(false);
-  }
-
-  function handleDemoLogin() {
-    demoLogin();
-    navigate('/dashboard');
   }
 
   async function handleGoogleLogin() {
@@ -155,10 +150,6 @@ export default function Signup() {
           <button type="button" onClick={handleGoogleLogin} className="btn btn-secondary btn-lg w-full" disabled={loading} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" style={{ width: 18, height: 18 }} />
             Sign up with Google
-          </button>
-
-          <button type="button" onClick={handleDemoLogin} className="btn btn-secondary btn-lg w-full" disabled={loading}>
-            🚀 Try Demo (No Account Needed)
           </button>
         </div>
 

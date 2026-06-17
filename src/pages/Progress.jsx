@@ -4,16 +4,8 @@ import { Scale, Camera, Upload, ArrowRight, BrainCircuit } from 'lucide-react';
 import { useData } from '../contexts/DataContext';
 
 export default function Progress() {
-  const { profile } = useData();
+  const { profile, weightLogs } = useData();
   const [photos, setPhotos] = useState([]);
-  const [weightLogs, setWeightLogs] = useState([
-    { date: '2023-01-01', weight: 80 },
-    { date: '2023-02-01', weight: 78.5 },
-    { date: '2023-03-01', weight: 77.2 },
-    { date: '2023-04-01', weight: 76.0 },
-    { date: '2023-05-01', weight: 75.1 },
-    { date: '2023-06-01', weight: 74.2 },
-  ]);
 
   // AI Transformation Predictor Logic (Mathematical Regression)
   const projectionData = useMemo(() => {
@@ -111,7 +103,9 @@ export default function Progress() {
                 <Area type="monotone" dataKey="actual" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorActual)" name="Actual Weight" />
                 <Area type="monotone" dataKey="projected" stroke="#f59e0b" strokeWidth={3} strokeDasharray="5 5" fillOpacity={1} fill="url(#colorProjected)" name="AI Projected" />
                 
-                <ReferenceLine x={weightLogs[weightLogs.length - 1].date} stroke="var(--text-tertiary)" strokeDasharray="3 3" label={{ position: 'top', value: 'Today', fill: 'var(--text-tertiary)', fontSize: 12 }} />
+                {weightLogs && weightLogs.length > 0 && (
+                  <ReferenceLine x={weightLogs[weightLogs.length - 1].date} stroke="var(--text-tertiary)" strokeDasharray="3 3" label={{ position: 'top', value: 'Today', fill: 'var(--text-tertiary)', fontSize: 12 }} />
+                )}
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -123,14 +117,14 @@ export default function Progress() {
             <Scale size={32} color="var(--brand-primary)" />
           </div>
           <h2 style={{ fontSize: 'var(--text-4xl)', fontWeight: 800, margin: 0 }}>
-            {weightLogs[weightLogs.length - 1].weight} <span style={{ fontSize: 'var(--text-lg)', color: 'var(--text-tertiary)' }}>kg</span>
+            {weightLogs && weightLogs.length > 0 ? weightLogs[weightLogs.length - 1].weight : '--'} <span style={{ fontSize: 'var(--text-lg)', color: 'var(--text-tertiary)' }}>kg</span>
           </h2>
           <p style={{ color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: 1, fontSize: 'var(--text-xs)', marginBottom: 'var(--space-6)' }}>Current Weight</p>
           
           <div style={{ borderTop: '1px solid var(--border-primary)', paddingTop: 'var(--space-4)', marginTop: 'var(--space-4)' }}>
             <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', marginBottom: 8 }}>Projected Weight (90 Days)</p>
             <h3 style={{ fontSize: 'var(--text-2xl)', color: 'var(--brand-warning)', margin: 0 }}>
-              {projectionData[projectionData.length - 1].projected} <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-tertiary)' }}>kg</span>
+              {projectionData && projectionData.length > 0 ? projectionData[projectionData.length - 1].projected : '--'} <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-tertiary)' }}>kg</span>
             </h3>
           </div>
         </div>

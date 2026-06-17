@@ -9,20 +9,13 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login, demoLogin, googleLogin } = useAuth();
+  const { login, googleLogin } = useAuth();
   const navigate = useNavigate();
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
     setLoading(true);
-    
-    // Intercept Portfolio Demo Account
-    if (email === 'demo@fitforge.ai' && password === 'demo123') {
-      demoLogin();
-      navigate('/dashboard');
-      return;
-    }
 
     try {
       await login(email, password);
@@ -31,11 +24,6 @@ export default function Login() {
       setError(err.message?.includes('invalid') ? 'Invalid email or password.' : 'Failed to sign in. Check your credentials.');
     }
     setLoading(false);
-  }
-
-  function handleDemoLogin() {
-    demoLogin();
-    navigate('/dashboard');
   }
 
   async function handleGoogleLogin() {
@@ -125,10 +113,6 @@ export default function Login() {
           <button type="button" onClick={handleGoogleLogin} className="btn btn-secondary btn-lg w-full" disabled={loading} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" style={{ width: 18, height: 18 }} />
             Sign in with Google
-          </button>
-          
-          <button type="button" onClick={handleDemoLogin} className="btn btn-secondary btn-lg w-full" disabled={loading}>
-            🚀 Try Demo (No Account Needed)
           </button>
         </div>
 

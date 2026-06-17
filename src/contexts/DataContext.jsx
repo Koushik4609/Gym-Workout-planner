@@ -1,7 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
-import { MOCK_USER_DATA } from '../data/mockUserData';
-
 const DataContext = createContext();
 
 export function useData() {
@@ -9,7 +7,7 @@ export function useData() {
 }
 
 export function DataProvider({ children }) {
-  const { currentUser, isDemo } = useAuth();
+  const { currentUser } = useAuth();
   
   const [profile, setProfile] = useState(null);
   const [prs, setPrs] = useState(null);
@@ -19,13 +17,7 @@ export function DataProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (isDemo) {
-      setProfile(MOCK_USER_DATA.profile);
-      setPrs(MOCK_USER_DATA.prs);
-      setWorkouts(MOCK_USER_DATA.workouts);
-      setWeightLogs(MOCK_USER_DATA.weightLogs);
-      setLoading(false);
-    } else if (currentUser) {
+    if (currentUser) {
       // For a real production app, fetch from Firestore here.
       // For now, we'll initialize empty states for real users.
       setProfile({ xp: 0, level: 1, streak: 0, totalWorkouts: 0, badges: [] });
@@ -45,7 +37,7 @@ export function DataProvider({ children }) {
       setWeightLogs([]);
       setLoading(false);
     }
-  }, [currentUser, isDemo]);
+  }, [currentUser]);
 
   // Methods to mutate data
   const addWorkout = (workout) => {
