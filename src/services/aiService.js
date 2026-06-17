@@ -68,6 +68,7 @@ Each object in the array represents a workout day (or rest day) and must exactly
   ]
 }
 
+Ensure that for each non-rest day, you provide a comprehensive list of exercises, typically 5 to 8 exercises per workout, to ensure a complete and effective session.
 If it is a rest day, "isRest" must be true, and "exercises" must be an empty array.
 Make sure you provide exactly 7 days of the week in the array.
 Only return valid JSON. Do not include markdown formatting like \`\`\`json.
