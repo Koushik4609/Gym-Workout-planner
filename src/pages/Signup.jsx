@@ -11,7 +11,7 @@ export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signup, demoLogin } = useAuth();
+  const { signup, demoLogin, googleLogin } = useAuth();
   const navigate = useNavigate();
 
   async function handleSubmit(e) {
@@ -38,6 +38,18 @@ export default function Signup() {
   function handleDemoLogin() {
     demoLogin();
     navigate('/dashboard');
+  }
+
+  async function handleGoogleLogin() {
+    setError('');
+    setLoading(true);
+    try {
+      await googleLogin();
+      navigate('/profile');
+    } catch (err) {
+      setError('Failed to sign in with Google.');
+    }
+    setLoading(false);
   }
 
   return (
@@ -139,9 +151,16 @@ export default function Signup() {
 
         <div style={{ textAlign: 'center', margin: 'var(--space-4) 0', color: 'var(--text-tertiary)', fontSize: 'var(--text-sm)' }}>or</div>
 
-        <button onClick={handleDemoLogin} className="btn btn-secondary btn-lg w-full">
-          🚀 Try Demo (No Account Needed)
-        </button>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+          <button type="button" onClick={handleGoogleLogin} className="btn btn-secondary btn-lg w-full" disabled={loading} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" style={{ width: 18, height: 18 }} />
+            Sign up with Google
+          </button>
+
+          <button type="button" onClick={handleDemoLogin} className="btn btn-secondary btn-lg w-full" disabled={loading}>
+            🚀 Try Demo (No Account Needed)
+          </button>
+        </div>
 
         <div className="auth-footer">
           Already have an account? <Link to="/login">Sign in</Link>
