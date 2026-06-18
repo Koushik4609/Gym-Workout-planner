@@ -121,27 +121,27 @@
 
 /* Light Theme Support */
 [data-theme='light'] {
-  --bg-primary: #F4F4F5;
+  --bg-primary: #FFFFFF;
   --bg-secondary: #FFFFFF;
-  --bg-tertiary: #FAFAFA;
+  --bg-tertiary: #FFFFFF;
   --bg-card: #FFFFFF;
-  --bg-card-hover: #F4F4F5;
-  --bg-input: #F4F4F5;
+  --bg-card-hover: #FFFFFF;
+  --bg-input: #FFFFFF;
   --bg-sidebar: #FFFFFF;
   --bg-modal: rgba(0, 0, 0, 0.4);
 
-  --border-primary: rgba(0, 0, 0, 0.08);
-  --border-secondary: rgba(0, 0, 0, 0.12);
+  --border-primary: #000000;
+  --border-secondary: #000000;
   
-  --text-primary: #09090B;
-  --text-secondary: #52525B;
-  --text-tertiary: #71717A;
-  --text-muted: #A1A1AA;
+  --text-primary: #000000;
+  --text-secondary: #000000;
+  --text-tertiary: #000000;
+  --text-muted: #000000;
   --text-inverse: #FFFFFF;
 
-  --glass-bg: rgba(255, 255, 255, 0.8);
-  --glass-border: rgba(0, 0, 0, 0.08);
-  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+  --glass-bg: rgba(255, 255, 255, 0.95);
+  --glass-border: #000000;
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 /* ── Base Reset ── */
