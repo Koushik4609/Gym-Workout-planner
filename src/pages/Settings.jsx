@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   User, Shield, Bell, Zap, Palette, Link as LinkIcon, Download,
@@ -6,6 +6,8 @@ import {
   Clock, Heart, AlertTriangle, CheckCircle, RefreshCw, Save
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useData } from '../contexts/DataContext';
+import { useTheme } from '../contexts/ThemeContext';
 import './Settings.css';
 
 // Reusable Animated Switch Component
@@ -25,7 +27,10 @@ const CustomSwitch = ({ isOn, onToggle }) => (
 );
 
 export default function Settings() {
-  const { currentUser } = useAuth();
+  const { currentUser, logout } = useAuth();
+  const { profile, updateProfile, clearWorkouts, factoryReset } = useData();
+  const { themeMode, setThemeMode } = useTheme();
+
   const [hasChanges, setHasChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showDangerModal, setShowDangerModal] = useState(false);
@@ -34,43 +39,54 @@ export default function Settings() {
   // Settings State
   const [settings, setSettings] = useState({
     // Account
-    name: currentUser?.displayName || 'Alex Fitness',
-    email: currentUser?.email || 'alex@example.com',
+    name: profile?.name || currentUser?.displayName || 'Alex Fitness',
+    email: profile?.email || currentUser?.email || 'alex@example.com',
     // AI Personalization
-    aiPersonality: 'Motivational',
-    workoutDifficulty: 'Intermediate',
-    workoutDuration: 45,
-    daysPerWeek: 4,
-    recoverySensitivity: 50,
-    aiStrength: 80,
+    aiPersonality: profile?.aiPersonality || 'Motivational',
+    workoutDifficulty: profile?.workoutDifficulty || 'Intermediate',
+    workoutDuration: profile?.workoutDuration || 45,
+    daysPerWeek: profile?.daysPerWeek || 4,
+    recoverySensitivity: profile?.recoverySensitivity || 50,
+    aiStrength: profile?.aiStrength || 80,
     // Notifications
-    notifWorkoutReminders: true,
-    notifDailyTips: true,
-    notifNutrition: false,
-    notifProgress: true,
-    notifAchievements: true,
-    notifEmail: false,
-    notifPush: true,
-    notifWeeklySummary: true,
+    notifWorkoutReminders: profile?.notifWorkoutReminders ?? true,
+    notifDailyTips: profile?.notifDailyTips ?? true,
+    notifNutrition: profile?.notifNutrition ?? false,
+    notifProgress: profile?.notifProgress ?? true,
+    notifAchievements: profile?.notifAchievements ?? true,
+    notifEmail: profile?.notifEmail ?? false,
+    notifPush: profile?.notifPush ?? true,
+    notifWeeklySummary: profile?.notifWeeklySummary ?? true,
     // Appearance
-    theme: 'Dark Mode',
-    accentColor: '#6366F1',
-    compactLayout: false,
-    reducedMotion: false,
+    theme: themeMode || 'System Theme',
+    accentColor: profile?.accentColor || '#6366F1',
+    compactLayout: profile?.compactLayout || false,
+    reducedMotion: profile?.reducedMotion || false,
     // Privacy
-    twoFactorAuth: true,
+    twoFactorAuth: profile?.twoFactorAuth ?? true,
     // Preferences
-    weightUnit: 'Kg',
-    heightUnit: 'Cm',
-    waterGoal: 3,
-    calorieGoal: 2500,
+    weightUnit: profile?.weightUnit || 'Kg',
+    heightUnit: profile?.heightUnit || 'Cm',
+    waterGoal: profile?.waterGoal || 3,
+    calorieGoal: profile?.calorieGoal || 2500,
     // Connected Apps
-    appGoogleFit: true,
-    appAppleHealth: false,
-    appFitbit: false,
-    appGarmin: true,
-    appStrava: false
+    appGoogleFit: profile?.appGoogleFit ?? true,
+    appAppleHealth: profile?.appAppleHealth ?? false,
+    appFitbit: profile?.appFitbit ?? false,
+    appGarmin: profile?.appGarmin ?? true,
+    appStrava: profile?.appStrava ?? false
   });
+
+  // Sync back from context if needed on reload
+  useEffect(() => {
+    if (profile) {
+      setSettings(prev => ({
+        ...prev,
+        ...profile,
+        theme: themeMode || prev.theme
+      }));
+    }
+  }, [profile, themeMode]);
 
   const updateSetting = (key, value) => {
     setSettings(prev => ({ ...prev, [key]: value }));
@@ -79,10 +95,19 @@ export default function Settings() {
 
   const handleSave = () => {
     setIsSaving(true);
+    
+    // Save to DataContext
+    updateProfile(settings);
+    
+    // Save theme to ThemeContext
+    if (settings.theme !== themeMode) {
+      setThemeMode(settings.theme);
+    }
+    
     setTimeout(() => {
       setIsSaving(false);
       setHasChanges(false);
-    }, 1500);
+    }, 800);
   };
 
   const triggerDangerAction = (action) => {
@@ -91,9 +116,18 @@ export default function Settings() {
   };
 
   const confirmDangerAction = () => {
-    // Execute action
     setShowDangerModal(false);
-    alert(`${dangerAction} completed.`);
+    if (dangerAction === 'Delete Account') {
+      logout();
+      // In a real app you would also delete user records from DB and Auth.
+      alert('Account signed out / deleted locally.');
+    } else if (dangerAction === 'Clear Workout Data') {
+      clearWorkouts();
+      alert('Workout data cleared.');
+    } else if (dangerAction === 'Factory Reset') {
+      factoryReset();
+      window.location.reload();
+    }
   };
 
   const Integrations = [
@@ -120,7 +154,7 @@ export default function Settings() {
           <div className="stat-card">
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)', marginBottom: 'var(--space-2)' }}>
               <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'var(--gradient-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: 20 }}>
-                {settings.name.charAt(0)}
+                {settings.name?.charAt(0) || 'A'}
               </div>
               <div>
                 <div style={{ fontWeight: 700, fontSize: 'var(--text-lg)' }}>{settings.name}</div>
@@ -133,7 +167,7 @@ export default function Settings() {
           <div className="stat-card">
             <div style={{ color: 'var(--brand-warning)', marginBottom: 8 }}><Zap size={24} /></div>
             <div style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>Workout Streak</div>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-3xl)', fontWeight: 800 }}>14 Days</div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-3xl)', fontWeight: 800 }}>{profile?.streak || 0} Days</div>
           </div>
 
           <div className="stat-card">
@@ -302,7 +336,7 @@ export default function Settings() {
                   onClick={() => updateSetting('accentColor', color)}
                   style={{ 
                     width: 24, height: 24, borderRadius: '50%', background: color, cursor: 'pointer',
-                    border: settings.accentColor === color ? '2px solid white' : '2px solid transparent',
+                    border: settings.accentColor === color ? '2px solid var(--text-primary)' : '2px solid transparent',
                     boxShadow: settings.accentColor === color ? `0 0 10px ${color}` : 'none'
                   }} 
                 />
@@ -323,7 +357,7 @@ export default function Settings() {
             </div>
             <CustomSwitch isOn={settings.reducedMotion} onToggle={() => updateSetting('reducedMotion', !settings.reducedMotion)} />
           </div>
-          <div style={{ padding: 'var(--space-4) var(--space-5)', borderTop: '1px solid rgba(255, 255, 255, 0.05)' }}>
+          <div style={{ padding: 'var(--space-4) var(--space-5)', borderTop: '1px solid var(--border-primary)' }}>
             <span className="settings-row-title" style={{ fontSize: 14 }}>Live Preview</span>
             <div className="theme-preview-card" style={{ background: settings.theme === 'Light Mode' ? '#ffffff' : '#121214', border: settings.theme === 'Light Mode' ? '1px solid #e5e7eb' : '1px solid rgba(255,255,255,0.1)' }}>
               <div className="theme-preview-header" style={{ background: settings.theme === 'Light Mode' ? '#f3f4f6' : 'rgba(255,255,255,0.1)' }} />
@@ -500,7 +534,11 @@ export default function Settings() {
             <div style={{ display: 'flex', gap: 12, marginLeft: 24 }}>
               <button 
                 className="btn btn-secondary" 
-                onClick={() => setHasChanges(false)}
+                onClick={() => {
+                  // Revert settings
+                  setSettings(prev => ({ ...prev, ...profile, theme: themeMode }));
+                  setHasChanges(false);
+                }}
                 disabled={isSaving}
               >
                 Cancel
@@ -523,7 +561,7 @@ export default function Settings() {
         {showDangerModal && (
           <div style={{ position: 'fixed', inset: 0, zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--space-4)' }}>
             <motion.div 
-              style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(4px)' }}
+              style={{ position: 'absolute', inset: 0, background: 'var(--bg-modal)', backdropFilter: 'blur(4px)' }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}

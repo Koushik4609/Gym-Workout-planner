@@ -19,15 +19,19 @@ export function DataProvider({ children }) {
   useEffect(() => {
     if (currentUser) {
       // For a real production app, fetch from Firestore here.
-      // For now, we'll initialize empty states for real users.
-      setProfile({ xp: 0, level: 1, streak: 0, totalWorkouts: 0, badges: [] });
+      // For now, we use localStorage for persistence.
+      const storedProfile = localStorage.getItem('fitforge-profile');
+      const storedWorkouts = localStorage.getItem('fitforge-workouts');
+      
+      setProfile(storedProfile ? JSON.parse(storedProfile) : { xp: 0, level: 1, streak: 0, totalWorkouts: 0, badges: [] });
+      setWorkouts(storedWorkouts ? JSON.parse(storedWorkouts) : []);
+      
       setPrs({
         bench: { current: 0, previous: 0 },
         squat: { current: 0, previous: 0 },
         deadlift: { current: 0, previous: 0 },
         ohp: { current: 0, previous: 0 }
       });
-      setWorkouts([]);
       setWeightLogs([]);
       setLoading(false);
     } else {
@@ -41,13 +45,40 @@ export function DataProvider({ children }) {
 
   // Methods to mutate data
   const addWorkout = (workout) => {
-    setWorkouts(prev => [workout, ...prev]);
+    setWorkouts(prev => {
+      const newWorkouts = [workout, ...prev];
+      localStorage.setItem('fitforge-workouts', JSON.stringify(newWorkouts));
+      return newWorkouts;
+    });
     // Basic Gamification: 100 XP per workout
     setProfile(prev => {
-      const newXp = prev.xp + 100;
+      const newXp = (prev?.xp || 0) + 100;
       const newLevel = Math.floor(newXp / 1000) + 1;
-      return { ...prev, xp: newXp, level: newLevel, totalWorkouts: prev.totalWorkouts + 1 };
+      const newProfile = { ...prev, xp: newXp, level: newLevel, totalWorkouts: (prev?.totalWorkouts || 0) + 1 };
+      localStorage.setItem('fitforge-profile', JSON.stringify(newProfile));
+      return newProfile;
     });
+  };
+
+  const updateProfile = (updates) => {
+    setProfile(prev => {
+      const newProfile = { ...prev, ...updates };
+      localStorage.setItem('fitforge-profile', JSON.stringify(newProfile));
+      return newProfile;
+    });
+  };
+
+  const clearWorkouts = () => {
+    setWorkouts([]);
+    localStorage.removeItem('fitforge-workouts');
+  };
+
+  const factoryReset = () => {
+    setProfile({ xp: 0, level: 1, streak: 0, totalWorkouts: 0, badges: [] });
+    setWorkouts([]);
+    localStorage.removeItem('fitforge-profile');
+    localStorage.removeItem('fitforge-workouts');
+    localStorage.removeItem('fitforge-theme-mode');
   };
 
   const updatePr = (lift, weight) => {
@@ -64,6 +95,9 @@ export function DataProvider({ children }) {
     weightLogs,
     loading,
     addWorkout,
+    updateProfile,
+    clearWorkouts,
+    factoryReset,
     updatePr
   };
 
