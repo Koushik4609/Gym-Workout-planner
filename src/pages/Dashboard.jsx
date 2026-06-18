@@ -130,7 +130,7 @@ export default function Dashboard() {
             </div>
           </motion.div>
 
-          <motion.div variants={itemVariants} className="card glass-premium" style={{ background: 'linear-gradient(145deg, rgba(24,24,27,0.8) 0%, rgba(9,9,11,0.9) 100%)' }}>
+          <motion.div variants={itemVariants} className="card glass-premium">
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
               <Sparkles size={20} color="var(--brand-info)" />
               <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--text-lg)', fontWeight: 700 }}>AI Coach Insights</h3>
