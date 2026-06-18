@@ -23,7 +23,8 @@ export function DataProvider({ children }) {
       const storedProfile = localStorage.getItem('fitforge-profile');
       const storedWorkouts = localStorage.getItem('fitforge-workouts');
       
-      setProfile(storedProfile ? JSON.parse(storedProfile) : { xp: 0, level: 1, streak: 0, totalWorkouts: 0, badges: [] });
+      const defaultProfileData = { xp: 0, level: 1, streak: 0, totalWorkouts: 0, badges: [] };
+      setProfile(storedProfile ? { ...defaultProfileData, ...JSON.parse(storedProfile) } : defaultProfileData);
       setWorkouts(storedWorkouts ? JSON.parse(storedWorkouts) : []);
       
       setPrs({

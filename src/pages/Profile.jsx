@@ -30,7 +30,7 @@ const DEFAULT_AVATARS = ['🦁', '🦊', '🦅', '🦍', '🐺', '⚡'];
 
 export default function Profile() {
   const { currentUser } = useAuth();
-  const { profile: dataProfile, prs } = useData();
+  const { profile: dataProfile, prs, updateProfile } = useData();
   const [saved, setSaved] = useState(false);
   
   // Profile settings state
@@ -93,7 +93,11 @@ export default function Profile() {
 
   function handleSave(e) {
     e.preventDefault();
-    localStorage.setItem('fitforge-profile', JSON.stringify(profile));
+    if (updateProfile) {
+      updateProfile(profile);
+    } else {
+      localStorage.setItem('fitforge-profile', JSON.stringify(profile));
+    }
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
   }
@@ -190,38 +194,38 @@ export default function Profile() {
 
       {/* Gamification Section */}
       {dataProfile && (
-        <div className="card glass-premium animate-slideUp" style={{ marginTop: 'var(--space-6)', marginBottom: 'var(--space-6)', padding: 'var(--space-5)', background: 'linear-gradient(135deg, rgba(99,102,241,0.05), rgba(168,85,247,0.05))' }}>
+        <div className="card glass-premium animate-slideUp" style={{ marginTop: 'var(--space-6)', marginBottom: 'var(--space-6)', padding: 'var(--space-5)', background: 'var(--bg-tertiary)' }}>
           <h3 style={{ marginBottom: 'var(--space-4)', display: 'flex', alignItems: 'center', gap: 8 }}><Target size={20} className="text-brand-primary" /> Fitness Journey</h3>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-6)', marginBottom: 'var(--space-5)' }}>
-            <div style={{ textAlign: 'center', padding: 'var(--space-3) var(--space-5)', background: 'var(--bg-tertiary)', borderRadius: 'var(--radius-lg)' }}>
-              <div style={{ fontSize: 'var(--text-3xl)', fontWeight: 800, fontFamily: 'var(--font-display)', color: 'var(--brand-primary)' }}>{dataProfile.level}</div>
+            <div style={{ textAlign: 'center', padding: 'var(--space-3) var(--space-5)', background: 'var(--bg-primary)', borderRadius: 'var(--radius-lg)' }}>
+              <div style={{ fontSize: 'var(--text-3xl)', fontWeight: 800, fontFamily: 'var(--font-display)', color: 'var(--brand-primary)' }}>{dataProfile.level || 1}</div>
               <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: 1 }}>Level</div>
             </div>
             
             <div style={{ flex: 1 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 'var(--text-sm)' }}>
                 <span style={{ fontWeight: 600 }}>XP Progress</span>
-                <span style={{ color: 'var(--text-secondary)' }}>{dataProfile.xp.toLocaleString()} XP</span>
+                <span style={{ color: 'var(--text-secondary)' }}>{(dataProfile.xp || 0).toLocaleString()} XP</span>
               </div>
-              <div className="progress-bar-container" style={{ height: 8, background: 'var(--bg-tertiary)', borderRadius: 4, overflow: 'hidden' }}>
-                <div className="progress-bar-fill" style={{ width: `${(dataProfile.xp % 1000) / 10}%`, height: '100%', background: 'var(--gradient-primary)', borderRadius: 4 }} />
+              <div className="progress-bar-container" style={{ height: 8, background: 'var(--bg-primary)', borderRadius: 4, overflow: 'hidden' }}>
+                <div className="progress-bar-fill" style={{ width: `${((dataProfile.xp || 0) % 1000) / 10}%`, height: '100%', background: 'var(--gradient-primary)', borderRadius: 4 }} />
               </div>
               <div style={{ marginTop: 6, fontSize: 11, color: 'var(--text-tertiary)', textAlign: 'right' }}>
-                {1000 - (dataProfile.xp % 1000)} XP to Next Level
+                {1000 - ((dataProfile.xp || 0) % 1000)} XP to Next Level
               </div>
             </div>
             
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 800, color: 'var(--brand-warning)' }}>🔥 {dataProfile.streak}</div>
+              <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 800, color: 'var(--brand-warning)' }}>🔥 {dataProfile.streak || 0}</div>
               <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: 1 }}>Day Streak</div>
             </div>
           </div>
           
           <div>
-            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', marginBottom: 8, display: 'block' }}>Unlocked Badges ({dataProfile.badges.length})</span>
+            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', marginBottom: 8, display: 'block' }}>Unlocked Badges ({(dataProfile.badges || []).length})</span>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-              {dataProfile.badges.map((badge, idx) => (
+              {(dataProfile.badges || []).map((badge, idx) => (
                 <div key={idx} style={{ padding: '6px 12px', background: 'rgba(245,158,11,0.1)', color: 'var(--brand-warning)', borderRadius: 20, fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
                   🎖️ {badge}
                 </div>
